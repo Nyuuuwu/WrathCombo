@@ -13,7 +13,7 @@ internal partial class RPR
         protected override uint Invoke(uint actionID, uint lastComboMove, float comboTime, byte level)
         {
             // Don't change anything if not basic skill
-            if (actionID is not Slice)
+            if (actionID is not Slice or WaxingSlice)
                 return actionID;
 
             //Variant Cure
@@ -37,7 +37,7 @@ internal partial class RPR
                 return actionID;
 
             //All Weaves
-            if (CanWeave(ActionWatching.LastWeaponskill))
+            if (CanWeave(ActionWatching.LastWeaponskill) && actionID is not WaxingSlice)
             {
                 //Arcane Cirlce
                 if (LevelChecked(ArcaneCircle) &&
@@ -103,7 +103,7 @@ internal partial class RPR
             if (RPRHelper.UseShadowOfDeath())
                 return ShadowOfDeath;
 
-            if (TargetHasEffect(Debuffs.DeathsDesign))
+            if (TargetHasEffect(Debuffs.DeathsDesign) && actionID is not WaxingSlice)
             {
                 //Perfectio
                 if (HasEffect(Buffs.PerfectioParata) && LevelChecked(Perfectio) && !RPRHelper.IsComboExpiring(1))
@@ -136,7 +136,7 @@ internal partial class RPR
                 }
 
                 //Plentiful Harvest
-                if (LevelChecked(PlentifulHarvest) &&
+                if (LevelChecked(PlentifulHarvest) && actionID is not WaxingSlice &&
                     !HasEffect(Buffs.Enshrouded) && !HasEffect(Buffs.SoulReaver) &&
                     !HasEffect(Buffs.Executioner) && HasEffect(Buffs.ImmortalSacrifice) &&
                     (GetBuffRemainingTime(Buffs.BloodsownCircle) <= 1 || JustUsed(Communio)))
