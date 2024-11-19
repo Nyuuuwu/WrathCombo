@@ -62,7 +62,7 @@ namespace XIVSlothCombo.Combos.PvE
 
         //Action Groups
         internal static readonly List<uint>
-            BroilList = [Ruin, Broil, Broil2, Broil3, Broil4],
+            BroilList = [Broil],
             AetherflowList = [EnergyDrain, Lustrate, SacredSoil, Indomitability, Excogitation],
             FairyList = [WhisperingDawn, FeyBlessing, FeyIllumination, Dissipation, Aetherpact];
 

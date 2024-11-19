@@ -109,6 +109,9 @@ internal partial class RPR
                     PlayerHealthPercentageHp() <= GetOptionValue(Config.RPR_VariantCure))
                     return Variant.VariantCure;
 
+                if (IsEnabled(CustomComboPreset.RPR_ST_Bloodstalk) && (level == 70) && (Gauge.Soul >= 50) && CanWeave(Slice))
+                    return OriginalHook(BloodStalk);
+
                 //Variant Rampart
                 if (IsEnabled(CustomComboPreset.RPR_Variant_Rampart) &&
                     IsEnabled(Variant.VariantRampart) &&
@@ -291,13 +294,16 @@ internal partial class RPR
                 GetRemainingCharges(All.TrueNorth) < 2 && trueNorthReady)
                 trueNorthDynReady = false;
 
-            if (actionID is Slice)
+            if (actionID is Slice or WaxingSlice)
             {
                 //Variant Cure
                 if (IsEnabled(CustomComboPreset.RPR_Variant_Cure) &&
                     IsEnabled(Variant.VariantCure) &&
                     PlayerHealthPercentageHp() <= GetOptionValue(Config.RPR_VariantCure))
                     return Variant.VariantCure;
+
+                if (IsEnabled(CustomComboPreset.RPR_ST_Bloodstalk) && (level == 70) && (Gauge.Soul >= 50) && CanWeave(Slice))
+                    return OriginalHook(BloodStalk);
 
                 //Variant Rampart
                 if (IsEnabled(CustomComboPreset.RPR_Variant_Rampart) &&
@@ -314,7 +320,7 @@ internal partial class RPR
                 //All Weaves
                 if (CanWeave(ActionWatching.LastWeaponskill))
                 {
-                    if (IsEnabled(CustomComboPreset.RPR_ST_CDs))
+                    if (actionID is not WaxingSlice && IsEnabled(CustomComboPreset.RPR_ST_CDs))
                     {
                         //Arcane Cirlce
                         if (IsEnabled(CustomComboPreset.RPR_ST_ArcaneCircle) &&
@@ -354,6 +360,9 @@ internal partial class RPR
                                  (LevelChecked(Gluttony) && IsOnCooldown(Gluttony) &&
                                   (Gauge.Soul is 100 || GetCooldownRemainingTime(Gluttony) > GCD * 4))))
                                 return OriginalHook(BloodStalk);
+
+                            if (IsEnabled(CustomComboPreset.RPR_ST_Bloodstalk) && (level == 70) && (Gauge.Soul >= 50) && CanWeave(Slice))
+                                return OriginalHook(BloodStalk);
                         }
                     }
 
@@ -390,7 +399,7 @@ internal partial class RPR
                 }
 
                 //Shadow Of Death
-                if (IsEnabled(CustomComboPreset.RPR_ST_SoD) &&
+                if (IsEnabled(CustomComboPreset.RPR_ST_SoD) && BossCheck() &&
                     RPRHelper.UseShadowOfDeath() && GetTargetHPPercent() > Config.RPR_SoDThreshold)
                     return ShadowOfDeath;
 
@@ -436,6 +445,7 @@ internal partial class RPR
                     //Plentiful Harvest
                     if (IsEnabled(CustomComboPreset.RPR_ST_CDs) &&
                         IsEnabled(CustomComboPreset.RPR_ST_PlentifulHarvest) &&
+                        actionID is not WaxingSlice &&
                         LevelChecked(PlentifulHarvest) &&
                         !HasEffect(Buffs.Enshrouded) && !HasEffect(Buffs.SoulReaver) &&
                         !HasEffect(Buffs.Executioner) && HasEffect(Buffs.ImmortalSacrifice) &&

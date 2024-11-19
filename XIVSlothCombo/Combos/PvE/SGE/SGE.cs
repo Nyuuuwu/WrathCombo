@@ -273,7 +273,7 @@ namespace XIVSlothCombo.Combos.PvE
 
             protected override uint Invoke(uint actionID, uint lastComboMove, float comboTime, byte level)
             {
-                bool ActionFound = actionID is Dosis2 || (!Config.SGE_ST_DPS_Adv && DosisList.ContainsKey(actionID));
+                bool ActionFound = actionID is Dosis;
 
                 if (ActionFound)
                 {
@@ -312,7 +312,7 @@ namespace XIVSlothCombo.Combos.PvE
 
                     // Lucid Dreaming
                     if (IsEnabled(CustomComboPreset.SGE_ST_DPS_Lucid) &&
-                        All.CanUseLucid(actionID, Config.SGE_ST_DPS_Lucid))
+                        All.CanUseLucid(actionID, Config.SGE_ST_DPS_Lucid) && CanSpellWeave(actionID) && GetDebuffRemainingTime(Debuffs.EukrasianDosis3) > 5)
                         return All.LucidDreaming;
 
                     // Variant
@@ -324,6 +324,7 @@ namespace XIVSlothCombo.Combos.PvE
 
                     // Rhizomata
                     if (IsEnabled(CustomComboPreset.SGE_ST_DPS_Rhizo) && CanSpellWeave(actionID) &&
+                        GetDebuffRemainingTime(Debuffs.EukrasianDosis3) > 5 &&
                         ActionReady(Rhizomata) && Gauge.Addersgall <= Config.SGE_ST_DPS_Rhizo)
                         return Rhizomata;
 
@@ -373,13 +374,19 @@ namespace XIVSlothCombo.Combos.PvE
                         if (IsEnabled(CustomComboPreset.SGE_ST_DPS_Phlegma) && InCombat())
                         {
                             uint phlegma = OriginalHook(Phlegma);
-                            if (InActionRange(phlegma) && ActionReady(phlegma)) return phlegma;
+
+                            if (InActionRange(phlegma) && CombatEngageDuration().TotalSeconds > 7.5 &&
+                                ActionReady(phlegma) && (GetRemainingCharges(Phlegma) == 1 &&
+                                GetCooldownChargeRemainingTime(Phlegma) <= 5) ||
+                                (GetRemainingCharges(Phlegma) == 2) && CombatEngageDuration().TotalSeconds > 7.5)
+                                return phlegma;
                         }
 
                         // Psyche
                         if (IsEnabled(CustomComboPreset.SGE_ST_DPS_Psyche) &&
                             ActionReady(Psyche) &&
                             InCombat() &&
+                            CombatEngageDuration().TotalSeconds > 7.5 &&
                             CanSpellWeave(actionID))
                             return Psyche;
 

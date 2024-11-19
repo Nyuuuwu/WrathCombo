@@ -53,7 +53,7 @@ namespace XIVSlothCombo.Combos.PvE
 
         //Action Groups
         internal static readonly List<uint>
-            StoneGlareList = [Stone1, Stone2, Stone3, Stone4, Glare1, Glare3];
+            StoneGlareList = [Stone1];
 
         public static class Buffs
         {
@@ -241,6 +241,7 @@ namespace XIVSlothCombo.Combos.PvE
                             // DoT Uptime & HP% threshold
                             float refreshtimer = Config.WHM_ST_MainCombo_DoT_Adv ? Config.WHM_ST_MainCombo_DoT_Threshold : 3;
                             if (GetDebuffRemainingTime(dotDebuffID) <= refreshtimer &&
+                                BossCheck() &&
                                 GetTargetHPPercent() > Config.WHM_STDPS_MainCombo_DoT)
                                 return OriginalHook(Aero);
                         }

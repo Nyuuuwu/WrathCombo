@@ -71,8 +71,8 @@ namespace XIVSlothCombo.Combos.PvE
 
         //Action Groups
         internal static readonly List<uint>
-            MaleficList = [Malefic, Malefic2, Malefic3, Malefic4, FallMalefic],
-            GravityList = [Gravity, Gravity2];
+            MaleficList = [Malefic],
+            GravityList = [Gravity];
 
         internal static class Buffs
         {
@@ -168,6 +168,7 @@ namespace XIVSlothCombo.Combos.PvE
                     !InCombat()))
                 {
                     if (IsEnabled(CustomComboPreset.AST_DPS_AutoDraw) &&
+                        (Gauge.DrawnCrownCard is not CardType.LORD) &&
                         ActionReady(OriginalHook(AstralDraw)) && (Gauge.DrawnCards.All(x => x is CardType.NONE) || (DrawnCard == CardType.NONE && Config.AST_ST_DPS_OverwriteCards)))
                         return OriginalHook(AstralDraw);
                 }
@@ -220,8 +221,7 @@ namespace XIVSlothCombo.Combos.PvE
                         if (MaleficCount == 4 && CanWeave(actionID))
                         {
                             if (ActionReady(OriginalHook(MinorArcana)) &&
-                            IsEnabled(CustomComboPreset.AST_DPS_LazyLord) && Gauge.DrawnCrownCard is CardType.LORD &&
-                            HasBattleTarget())
+                            Gauge.DrawnCrownCard is CardType.LORD)
                                 return OriginalHook(MinorArcana);
 
                             if (IsEnabled(CustomComboPreset.AST_DPS_AutoDraw) && Gauge.DrawnCrownCard is not CardType.LORD && CanDelayedWeave(actionID))
@@ -247,6 +247,8 @@ namespace XIVSlothCombo.Combos.PvE
                     //End opener
 
                     if (IsEnabled(CustomComboPreset.AST_DPS_LightSpeed) &&
+                        !HasEffect(Buffs.Lightspeed) &&
+                        ((GetRemainingCharges(Lightspeed) >= 1 && GetCooldownChargeRemainingTime(Lightspeed) <= 3) || GetRemainingCharges(Lightspeed) >= 2 || (CombatEngageDuration().TotalSeconds < 8) || GetRemainingCharges(Lightspeed) >= 1 && GetCooldownRemainingTime(Divination) <= 5) &&
                         ActionReady(Lightspeed) &&
                         GetTargetHPPercent() > Config.AST_DPS_LightSpeedOption &&
                         IsMoving &&
@@ -264,7 +266,7 @@ namespace XIVSlothCombo.Combos.PvE
 
                     //Play Card
                     if (IsEnabled(CustomComboPreset.AST_DPS_AutoPlay) &&
-                        ActionReady(Play1) &&
+                        ActionReady(Play1) && (GetCooldownRemainingTime(Divination) <= 3 || HasEffect(Buffs.Divination)) &&
                         Gauge.DrawnCards[0] is not CardType.NONE &&
                         CanSpellWeave(actionID) &&
                         spellsSinceDraw >= Config.AST_ST_DPS_Play_SpeedSetting)
@@ -273,6 +275,7 @@ namespace XIVSlothCombo.Combos.PvE
                     //Card Draw
                     if (IsEnabled(CustomComboPreset.AST_DPS_AutoDraw) &&
                         ActionReady(OriginalHook(AstralDraw)) &&
+                        Gauge.DrawnCrownCard is not CardType.LORD &&
                         (Gauge.DrawnCards.All(x => x is CardType.NONE) || (DrawnCard == CardType.NONE && Config.AST_ST_DPS_OverwriteCards)) &&
                         CanDelayedWeave(actionID))
                         return OriginalHook(AstralDraw);
@@ -301,6 +304,7 @@ namespace XIVSlothCombo.Combos.PvE
                     if (ActionReady(OriginalHook(MinorArcana)) &&
                         IsEnabled(CustomComboPreset.AST_DPS_LazyLord) && Gauge.DrawnCrownCard is CardType.LORD &&
                         HasBattleTarget() &&
+                        HasEffect(Buffs.Divination) &&
                         CanDelayedWeave(actionID))
                         return OriginalHook(MinorArcana);                                       
 
@@ -308,6 +312,7 @@ namespace XIVSlothCombo.Combos.PvE
                     {
                         //Combust
                         if (IsEnabled(CustomComboPreset.AST_ST_DPS_CombustUptime) &&
+                            BossCheck() &&
                             !GravityList.Contains(actionID) &&
                             LevelChecked(Combust) &&
                             CombustList.TryGetValue(OriginalHook(Combust), out ushort dotDebuffID))

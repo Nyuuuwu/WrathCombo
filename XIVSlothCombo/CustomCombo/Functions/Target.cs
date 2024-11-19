@@ -22,6 +22,23 @@ namespace XIVSlothCombo.CustomComboNS.Functions
 {
     internal abstract partial class CustomComboFunctions
     {
+        public bool BossCheck()
+        {
+            double maxHealth = LocalPlayer.MaxHp;
+
+            if (CurrentTarget is not IBattleChara chara)
+                return false;
+
+            if (chara.CastActionId != 26659 &&
+                EnemyHealthCurrentHp() >= maxHealth * 10 && GetTargetHPPercent() >= 1)
+            {
+                return true;
+            }
+
+            // Else
+            else return false;
+        }
+
         /// <summary> Gets the current target or null. </summary>
         public static IGameObject? CurrentTarget => Svc.Targets.Target;
 
